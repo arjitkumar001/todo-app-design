@@ -3,12 +3,41 @@ import React, { useState } from 'react'
 // import Hover from './Hover'
 function TopBar() {
     const [toggle, setToggle] = useState()
-    const [hover, setHover] = useState()
-    const [title, setTitle] = useState("");
-    const [title1, setTitle1] = useState([])
-    const [description, setDescription] = useState("");
-    const [description1, setDescription1] = useState([])
+    const [show, setShow] = useState()
 
+    const [allValue, setAllValue] = useState([])
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    
+    
+
+    const addTask = () => {
+        if (title && description) {
+            const newTask = {
+                id: new Date().getTime(),
+                title,
+                description
+            }
+            setAllValue([...allValue, newTask]);
+            setTitle("");
+            setDescription("");
+        }
+    }
+    // console.log(allValue);
+
+    // delete 
+    const deleteItem = (id) => {
+        const deletedTask = allValue.filter((task) => task.id !== id);
+        setAllValue(deletedTask);
+    }
+
+    // edit
+    const editItem = (id) => {
+        const selecteditem = allValue.find((task) => task.id === id);
+        setTitle(selecteditem.title);
+        setDescription(selecteditem.description);
+        deleteItem(id);
+        };
 
     return (
         <>
@@ -19,7 +48,10 @@ function TopBar() {
                             <h1>todo</h1>
                         </div>
                         <div className="plusIcon">
-                            <h1 onClick={() => setToggle(!toggle)}>+</h1>
+                            <h1 onClick={() => {
+                                setToggle(!toggle);
+                                setShow("")
+                            }}>+</h1>
                             {
                                 toggle && (
 
@@ -28,12 +60,8 @@ function TopBar() {
                                             <div className="btn-sec">
                                                 <div> <button className='btn-cancle' onClick={(() => setToggle(''))}>Cancel</button></div>
                                                 <div>  <button className='btn-add' onClick={() => {
-                                                    setToggle('')
-                                                    setTitle1((t) => [...t, title]);
-                                                    setDescription1((d) => [...d, description])
-                                                    setTitle("")
-                                                    setDescription("")
-
+                                                    setToggle('');
+                                                    addTask()
                                                 }
 
                                                 }
@@ -44,10 +72,19 @@ function TopBar() {
                                             <div className="input-sec">
                                                 <label>Title:</label>
                                                 <br />
-                                                <input type="text" name="" id="" placeholder='add title' onChange={(e) => setTitle(e.target.value)} value={title} />
+                                                <input type="text" name="" id="" placeholder='add title........' onChange={(e) => setTitle(e.target.value)} value={title} />
                                                 <label>Description:</label>
                                                 <br />
-                                                <textarea name="discription" id="" cols="30" rows="4" placeholder='discription' onChange={(e) => setDescription(e.target.value)} value={description}></textarea>
+                                                <textarea name="discription" id="" cols="30" rows="4" placeholder='discription.......' onChange={(e) => setDescription(e.target.value)} value={description}></textarea>
+                                            </div>
+                                            <div className="tags">
+                                                <h2>Tags</h2>
+                                                <div className="tags-items">
+                                                    <div className="work"><p ></p><a href="#">work</a> </div>
+                                                    <div className="study"><p ></p><a href="#">study</a> </div>
+                                                    <div className="entertainment"><p ></p> <a href="#">entertainment</a></div>
+                                                    <div className="family"><p ></p><a href="#">family</a> </div>
+                                                </div>
                                             </div>
 
                                         </form>
@@ -65,27 +102,37 @@ function TopBar() {
                             <div className="family"><p ></p><a href="#">family</a> </div>
                             <div className='checkbox'><input type="checkbox" name="" id="" className='hide-checkbox' /><span>Hide Done Tasks</span></div>
                         </div>
-                        {
-                            (title1, description1).map(() => {
-                                return (
-                                    <div className="task-section" >
-                                        <div className="task-section-1">
-                                            <div className="task-1">
+                        <div className="task-section" >
+                            {
+                                allValue.map((task) => {
+                                    return (
+
+                                        <div className="task-section-1" key={task.id}>
+                                            <div className="task-1" >
                                                 <div className="task-top1">
-                                                    <h3>{title1}</h3>
-                                                    <h3 className='hover-effect' onClick={() => { setHover(!hover) }} >...</h3>
+                                                    <h3>{task.title}</h3>
+                                                    <h3 className='hover-effect' onClick={() => { setShow(!show) }} >...</h3>
                                                     {
-                                                        hover && (
+                                                        show && (
                                                             <div className="hover">
-                                                                <div className="edit"><p>Edit...</p></div>
+                                                                <div className="edit"><p onClick={() => {
+                                                                    setToggle(!toggle)
+                                                                    editItem(task.id);
+                                                                    setShow("");
+                                                                }}>Edit...</p></div>
                                                                 <hr />
-                                                                <div className="delete"><p >Delete...</p></div>
+                                                                <div className="delete"><p onClick={() => {
+                                                                    deleteItem(task.id);
+                                                                    setShow("")
+
+                                                                }
+                                                                }>Delete...</p></div>
                                                             </div>
                                                         )
                                                     }
                                                 </div>
                                                 <div className="task-txt-1">
-                                                    <p>{description1}</p>
+                                                    <p>{task.description}</p>
                                                 </div>
                                                 <div className="task-bootom-1">
                                                     <div className="bottom-left-1">
@@ -98,10 +145,11 @@ function TopBar() {
                                             </div>
                                         </div>
 
-                                    </div>
-                                )
-                            })
-                        }
+
+                                    )
+                                })
+                            }
+                        </div>
 
                     </div>
                 </div>
